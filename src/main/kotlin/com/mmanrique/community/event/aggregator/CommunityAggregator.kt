@@ -59,6 +59,7 @@ class CommunityAggregator {
             val communityEvent = nextEvent?.let { convertToEvent(it, city!!, name!!, url) }
             communityEvent?.let { events += it }
         }
+        events.sortBy { it.time }
         return events
     }
 
