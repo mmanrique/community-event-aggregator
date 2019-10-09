@@ -15,7 +15,7 @@ class ResultsController {
 
     @GetMapping("/", produces = ["application/json"])
     @ResponseBody
-    fun returnSomething(): List<Event> {
-        return communityAggregator.aggregateData()
+    fun returnSomething(): String {
+        return "DIfferent text"
     }
 }
