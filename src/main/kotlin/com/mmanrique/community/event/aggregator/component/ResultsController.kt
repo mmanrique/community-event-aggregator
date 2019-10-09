@@ -17,7 +17,7 @@ class ResultsController {
     @GetMapping("/", produces = ["application/json"])
     @CrossOrigin
     @ResponseBody
-    fun returnSomething(): String {
-        return "DIfferent text"
+    fun returnSomething(): List<Event> {
+        return communityAggregator.aggregateData()
     }
 }
