@@ -7,6 +7,8 @@ import com.mmanrique.community.event.aggregator.model.Event
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
 import org.springframework.stereotype.Component
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 @Component
@@ -33,7 +35,8 @@ class CommunityAggregator {
         }
         return null;
     }
-    fun getMeetupEventUrl(communityUrl:String, eventId:String): String {
+
+    fun getMeetupEventUrl(communityUrl: String, eventId: String): String {
         return communityUrl + "events/" + eventId
     }
 
@@ -46,7 +49,7 @@ class CommunityAggregator {
 
     }
 
-    fun aggregateData():List<Event> {
+    fun aggregateData(): Map<String, List<Event>> {
         val communities = getCommunities()
         val events = mutableListOf<Event>()
         for (community in communities) {
@@ -59,8 +62,10 @@ class CommunityAggregator {
             val communityEvent = nextEvent?.let { convertToEvent(it, city!!, name!!, url) }
             communityEvent?.let { events += it }
         }
-        events.sortBy { it.time }
-        return events
+        val groupBy = events.groupBy { it.dateString }
+        return groupBy.toSortedMap(compareBy<String> {
+            SimpleDateFormat("dd/MM/yyyy").parse(it)
+        })
     }
 
     fun convertToEvent(o: JsonObject, city: String, communityName: String, url: String): Event {
@@ -68,11 +73,11 @@ class CommunityAggregator {
         val name = o.string("name")
         val yesRsvpCount = o.long("yes_rsvp_count")
         val time = o.long("time")
-        val utcOffset = o.long("utc_offset")
         val eventUrl = getMeetupEventUrl(url, id!!)
-        return Event(id, name!!, yesRsvpCount!!, time!!, utcOffset!!, city, communityName, url, eventUrl)
+        val date = Date(time!!)
+        val format = SimpleDateFormat("dd/MM/yyyy").format(date)
+        return Event(id, name!!, yesRsvpCount!!, time, format, city, communityName, url, eventUrl)
     }
-
 
     companion object {
         val COMMUNITIES_JSON =

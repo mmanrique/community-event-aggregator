@@ -5,7 +5,7 @@ data class Event(
     val name: String,
     val confirmed: Long,
     val time: Long,
-    val utcOffset: Long,
+    val dateString:String,
     val city: String = "",
     val communityName: String,
     val url: String,
